@@ -89,9 +89,9 @@ def main(fnames):
         Data[keys[idx]] = buf
         idx = idx + 1
     
-    sio.savemat('test.mat',Data)
+    sio.savemat('test.mat',Data, do_compression=True)
     
 if __name__=='__main__':
-    main(['signals-2010a.txt','signals-2011a.txt','signals-2012a.txt','signals-2013a.txt'])
+    main(['data/signals-2010a.txt','data/signals-2011a.txt','data/signals-2012a.txt','data/signals-2013a.txt'])
     
     
