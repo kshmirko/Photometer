@@ -6,6 +6,8 @@ Created on Wed Apr 24 12:35:51 2013
 """
 
 from photo.calibrationFile import readCalibration
+import pandas as pds
+
 
 class BasePhoto(object):
     """
@@ -19,10 +21,11 @@ class BasePhoto(object):
     def _readCalibration(self, fname=None):
         self.calibrCoefs = readCalibration(fname)
         
-    def _correctTime(self):
-        pass
     
     def _calcLogarithms(self):
+        pass
+    
+    def _calcAOTs(self):
         pass
         
 
