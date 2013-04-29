@@ -42,6 +42,13 @@ def datetime2matlabdn(dt):
    frac_seconds = (dt-datetime(dt.year,dt.month,dt.day,0,0,0)).seconds / (24.0 * 60.0 * 60.0)
    frac_microseconds = dt.microsecond / (24.0 * 60.0 * 60.0 * 1000000.0)
    return mdn.toordinal() + frac_seconds + frac_microseconds
+   
+def matlabdn2datetime(dn):
+    time = dn-np.floor(dn)
+    dt = datetime.fromordinal(int(dn))
+    dt = dt - timedelta(days=366) + timedelta(seconds=time*24.0*3600.0)
+    return dt
+    
 
     
 def convert(dt):
@@ -82,7 +89,11 @@ def main(fnames):
         Data[keys[idx]] = buf
         idx = idx + 1
     Data['calibration'] = readCalibration('photo/calcSP9iapu')
-    sio.savemat('test.mat',Data, do_compression=True, oned_as='row')
+    sio.savemat('SPMData.mat', Data, do_compression=True, oned_as='row')
+    
+    dt = datetime.now()
+    print dt
+    print matlabdn2datetime(datetime2matlabdn(dt))
     
 if __name__=='__main__':
     main(['data/signals-2010a.txt','data/signals-2011a.txt','data/signals-2012a.txt','data/signals-2013a.txt'])
