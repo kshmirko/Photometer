@@ -6,16 +6,17 @@ Created on Sat Mar 30 23:51:40 2013
 """
 
 import locale
-locale.setlocale(locale.LC_TIME,'russian')
+locale.setlocale(locale.LC_TIME,'ru_RU.UTF-8')
 from matplotlib import rc
 import matplotlib
 
-font = {'family' : 'Times New Roman',
+FONTNAME = 'DejaVu Serif'
+
+font = {'family' : FONTNAME,
         'weight' : 'normal',
         'size'   : 14}
 
 rc('font', **font)
-
 
 matplotlib.use('TkAgg')
 

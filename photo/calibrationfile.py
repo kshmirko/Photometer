@@ -23,6 +23,28 @@ __all__=['readCalibration']
 import numpy as np
 import re
 
+#reindexing dict
+
+index = {'K1':'I307',
+         'K2':'I322',
+         'K3':'I343',
+         'K4':'I368',
+         'K5':'I1242',
+         'K6':'I1557',
+         'K7':'I2139',
+         'K8':'I411',
+         'K9':'I439',
+         'K10':'I500',
+         'K11':'I870',
+         'K12':'I936',
+         'K13':'I1042',
+         'K15':'I549',
+         'K16':'I672',
+         'K17':'I775',
+         }
+
+
+
 # Describes the structure of the calibration file.
 DTYPE_CH=[ \
     ('wavelen', '>f8'),\
@@ -104,7 +126,7 @@ def __readCahnels(f,Nch):
         name_len = np.fromfile(f, '>i4', 1)[0]
         #transform the two-byte string in single-byte
         names = re.sub('\x00','',f.read(name_len)).upper()
-        ret[names] = np.fromfile(f, dtype=DTYPE_CH, count=1)[0]
+        ret[index[names]] = np.fromfile(f, dtype=DTYPE_CH, count=1)[0]
         
     return ret
         
