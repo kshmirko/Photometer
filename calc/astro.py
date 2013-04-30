@@ -7,7 +7,6 @@ Created on Mon Apr  1 14:47:24 2013
 
 __all__=['getEarth2SunDistance', 'getRayleigh']
 
-
 import numpy as np
 from datetime import datetime
 
@@ -41,12 +40,21 @@ def _getAirRefrIdx300ppmC02(wl=0.532):
     ret refractive index for air with 300 ppm of CO2
     getAirRefrIdx300ppmC02(wl=0.532)
     """
-    return (8060.51+2480990/(132.274-wl**(-2))+17455.7/(39.32957-wl**(-2)))/1.0e8+1
+    return (8060.77+2480990/(132.274-wl**(-2))+17455.7/(39.32957-wl**(-2)))/1.0e8+1
+    
+    
+def _getAirRefrIdx360ppmC02(wl=0.532):
+    """
+    ret refractive index for air with 300 ppm of CO2
+    getAirRefrIdx300ppmC02(wl=0.532)
+    """
+    return (8060.51+2481070/(132.274-wl**(-2))+17456.3/(39.32957-wl**(-2)))/1.0e8+1
+    
     
 def _getAirRefrIdxArbC02(wl=0.532, CO2=300):
     """
     """
-    return (1+0.54*(CO2/1.0e6-0.0003))*(_getAirRefrIdx300ppmC02(wl)-1)+1
+    return (1+0.54*((CO2*1e-6)-300e-6))*(_getAirRefrIdx300ppmC02(wl)-1)+1
     
 def _getFN2(wl=0.532):
     """
@@ -70,12 +78,12 @@ def _getFAir(wl=0.532, CO2=300):
     return (78.084*_getFN2(wl)+20.946*_getFO2(wl)+0.934+CO2*1.15)/(78.084+20.946+0.934+CO2)
 
 
-def _getSigmaRayleigh(wl=0.532, CO2=300):
+def _getSigmaRayleigh(wl=0.532, CO2=300, T=288.15):
     """
     """
     n = _getAirRefrIdxArbC02(wl, CO2)
     F = _getFAir(wl, CO2)
-    Ns = 2.546899e19
+    Ns = 6.0221367e23*273.15/(22.4141*T)/1000.0
     wl=wl*1e-4
     return (24*np.pi**3*(n**2-1)**2*F)/(wl**4*Ns**2*(n**2+2)**2)
 
@@ -93,16 +101,22 @@ def _getGravity(lat=43.1, alt=30):
         (1.517e-17+6e-20*cos2phi)*alt**3
     return g
         
-    
+def _getMassWeightedAltitude(alt=30):
+    """
+    calculates mass-weighted altitude for optical thickness calculations
+    """
+    return 5517.56+0.73737*alt
 
-def getRayleigh(wl=0.532, P=101300.0, T0=288.0, CO2=300, lat=43.1, alt=30.0):
+def getRayleigh(wl=0.532, P=101300.0, CO2=300, lat=43.1, alt=30.0):
     """
     calculates rayleigh optical thickness
     >> tau_m = getRayleigh(wl=0.532, P=101300.0, T0=288.0, CO2=300, lat=43.1, alt=30.0)
     """
-    sigma = _getSigmaRayleigh(wl, CO2)
+    T=288.15
+    mwa = _getMassWeightedAltitude(alt)
+    sigma = _getSigmaRayleigh(wl, CO2, T)
     mair = _getAirMolarMass(CO2)
-    g = _getGravity(lat, alt)
+    g = _getGravity(lat, mwa)
     A = 6.0221367e23
     tr = sigma*P*A*10/(mair*g)
     return tr
