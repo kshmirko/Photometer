@@ -119,15 +119,16 @@ def __readCahnels(f,Nch):
     """
     Reads the channel setting.
     """
-    ret = {}
+#    ret = {}
+    ret = []
     names=None
     
     for i in range(Nch):
         name_len = np.fromfile(f, '>i4', 1)[0]
         #transform the two-byte string in single-byte
         names = re.sub('\x00','',f.read(name_len)).upper()
-        ret[index[names]] = np.fromfile(f, dtype=DTYPE_CH, count=1)[0]
-        
+#        ret[index[names]] = np.fromfile(f, dtype=DTYPE_CH, count=1)[0]
+        ret.append(np.fromfile(f, dtype=DTYPE_CH, count=1)[0])
     return ret
         
         

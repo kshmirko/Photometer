@@ -23,7 +23,7 @@ import pandas.lib as lib
 import numpy as np
 from datetime import datetime, timedelta
 from photo.calibrationfile import readCalibration
-
+from filestruct.ncfile import putdata
 
 def parser_fast(DD,MM,YY,HH,NN,SS):
     """
@@ -37,28 +37,15 @@ def parser_fast(DD,MM,YY,HH,NN,SS):
     SS = _maybe_cast(SS)
     return lib.try_parse_datetime_components(YY+2000, MM, DD,
                                              HH, NN, SS)
-def datetime2matlabdn(dt):
-   mdn = dt + timedelta(days = 366)
-   frac_seconds = (dt-datetime(dt.year,dt.month,dt.day,0,0,0)).seconds / (24.0 * 60.0 * 60.0)
-   frac_microseconds = dt.microsecond / (24.0 * 60.0 * 60.0 * 1000000.0)
-   return mdn.toordinal() + frac_seconds + frac_microseconds
-   
-def matlabdn2datetime(dn):
-    time = dn-np.floor(dn)
-    dt = datetime.fromordinal(int(dn))
-    dt = dt - timedelta(days=366) + timedelta(seconds=time*24.0*3600.0)
-    return dt
     
-
-    
-def convert(dt):
-    return np.array([datetime2matlabdn(x) for x in dt])
     
 def main(fnames):
-    import scipy.io as sio
-    Data={}
+
     keys=['Y2010','Y2011','Y2012','Y2013']
     idx=0
+    
+    calibration= readCalibration('photo/calcSP9iapu')    
+
     for fname in fnames:    
     
         data = pds.read_table(fname, delimiter=' ', skipinitialspace=True,\
@@ -66,34 +53,15 @@ def main(fnames):
                 index_col = 'datetime')
         
         
-        print data.index[0]
-        buf={}
-        buf['datetime']=convert(data.index)
-        buf['I307'] = data['K1']
-        buf['I322'] = data['K2']
-        buf['I343'] = data['K3']
-        buf['I368'] = data['K4']
-        buf['I1242'] = data['K5']
-        buf['I1557'] = data['K6']
-        buf['I2139'] = data['K7']
-        buf['I411'] = data['K8']
-        buf['I439'] = data['K9']
-        buf['I500'] = data['K10']
-        buf['I870'] = data['K11']
-        buf['I936'] = data['K12']        
-        buf['I1042'] = data['K13']
-        buf['I549'] = data['K15']
-        buf['I672'] = data['K16']
-        buf['I775'] = data['K17']
+#        print data.index[0]
+        putdata(keys[idx], data, calibration)
         
-        Data[keys[idx]] = buf
         idx = idx + 1
-    Data['calibration'] = readCalibration('photo/calcSP9iapu')
-    sio.savemat('SPMData.mat', Data, do_compression=True, oned_as='row')
     
-    dt = datetime.now()
-    print dt
-    print matlabdn2datetime(datetime2matlabdn(dt))
+    
+    
+
+
     
 if __name__=='__main__':
     main(['data/signals-2010a.txt','data/signals-2011a.txt','data/signals-2012a.txt','data/signals-2013a.txt'])
